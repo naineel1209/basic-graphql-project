@@ -1,34 +1,28 @@
 import prisma from "../lib/prisma_client";
 
-export interface createUserPayload
-{
+export interface createUserPayload {
   name: string;
   email: string;
   streamId: string;
 }
 
-export interface createStreamPayload
-{
+export interface createStreamPayload {
   name: string;
 }
 
-export interface createCoursePayload
-{
+export interface createCoursePayload {
   name: string;
   streamId: string;
 }
 
 
-class UserServices
-{
-  static async getUsers()
-  {
+class UserServices {
+  static async getUsers() {
     const users = await prisma.user.findMany();
     return users;
   }
 
-  static async getUsersById(id: string)
-  {
+  static async getUsersById(id: string) {
     return await prisma.user.findUnique({
       where: {
         id
@@ -36,8 +30,7 @@ class UserServices
     });
   }
 
-  static async getUsersByStreamId(streamId: string)
-  {
+  static async getUsersByStreamId(streamId: string) {
     return await prisma.user.findMany({
       where: {
         streamId
@@ -45,8 +38,22 @@ class UserServices
     });
   }
 
-  static async createUser({ name, email, streamId }: createUserPayload)
-  {
+  static async getUsersByCourseId(courseId: string) {
+    const courses = await prisma.course.findUnique({
+      where: {
+        id: courseId
+      }
+    });
+    const users = await prisma.user.findMany({
+      where: {
+        streamId: courses?.streamId
+      }
+    });
+
+    return (users) ? users : [];
+  }
+
+  static async createUser({ name, email, streamId }: createUserPayload) {
     return await prisma.user.create({
       data: {
         name,
@@ -60,13 +67,11 @@ class UserServices
     });
   }
 
-  static async getStreams()
-  {
+  static async getStreams() {
     return await prisma.stream.findMany();
   }
 
-  static async getStreamsById(id: string)
-  {
+  static async getStreamsById(id: string) {
     return await prisma.stream.findUnique({
       where: {
         id
@@ -74,8 +79,7 @@ class UserServices
     })
   }
 
-  static async createStream({ name }: createStreamPayload)
-  {
+  static async createStream({ name }: createStreamPayload) {
     return await prisma.stream.create({
       data: {
         name
@@ -83,13 +87,11 @@ class UserServices
     })
   }
 
-  static async getCourses()
-  {
+  static async getCourses() {
     return await prisma.course.findMany();
   }
 
-  static async getCoursesById(id: string)
-  {
+  static async getCoursesById(id: string) {
     return await prisma.course.findUnique({
       where: {
         id
@@ -97,8 +99,7 @@ class UserServices
     })
   }
 
-  static async getCoursesByStreamId(streamId: string)
-  {
+  static async getCoursesByStreamId(streamId: string) {
     return await prisma.course.findMany({
       where: {
         streamId
@@ -106,8 +107,21 @@ class UserServices
     });
   }
 
-  static async createCourse({ name, streamId }: createCoursePayload)
-  {
+  static async getCoursesByUserId(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    })
+    const courses = await prisma.course.findMany({
+      where: {
+        streamId: user?.streamId
+      }
+    });
+    return (courses) ? courses : [];
+  }
+
+  static async createCourse({ name, streamId }: createCoursePayload) {
     return await prisma.course.create({
       data: {
         name,

@@ -17,6 +17,9 @@ dependencies:
   dotenv:
     specifier: ^16.4.4
     version: 16.4.4
+  express:
+    specifier: ^4.18.2
+    version: 4.18.2
 
 devDependencies:
   '@types/express':

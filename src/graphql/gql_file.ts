@@ -7,6 +7,7 @@ export const typeDefs = `#graphql
     email: String!
     userStream: Stream!
     streamId: ID!
+    courses: [Course!]
   }
 
   type Stream{
@@ -21,6 +22,7 @@ export const typeDefs = `#graphql
     name: String!
     courseStream: Stream!
     streamId: ID!
+    users: [User!]
   }
 
   type Query{
@@ -41,61 +43,55 @@ export const typeDefs = `#graphql
 
 export const resolvers = {
   Query: {
-    users: async () =>
-    {
+    users: async () => {
       return await UserServices.getUsers();
     },
-    user: async (_: any, { id }: { id: string }) =>
-    {
+    user: async (_: any, { id }: { id: string }) => {
       return await UserServices.getUsersById(id);
     },
-    streams: async () =>
-    {
+    streams: async () => {
       return await UserServices.getStreams();
     },
-    stream: async (_: any, { id }: { id: string }) =>
-    {
+    stream: async (_: any, { id }: { id: string }) => {
       return await UserServices.getStreamsById(id);
     },
-    courses: async () =>
-    {
+    courses: async () => {
       return await UserServices.getCourses();
     },
   },
 
   Mutation: {
-    createUser: async (_: any, { name, email, streamId }: { name: string, email: string, streamId: string }) =>
-    {
+    createUser: async (_: any, { name, email, streamId }: { name: string, email: string, streamId: string }) => {
       return await UserServices.createUser({ name, email, streamId });
     },
-    createStream: async (_: any, { name }: { name: string }) =>
-    {
+    createStream: async (_: any, { name }: { name: string }) => {
       return await UserServices.createStream({ name });
     },
-    createCourse: async (_: any, { name, streamId }: { name: string, streamId: string }) =>
-    {
+    createCourse: async (_: any, { name, streamId }: { name: string, streamId: string }) => {
       return await UserServices.createCourse({ name, streamId });
     }
   },
   User: {
-    userStream: async (parent: any, _: any, { prisma }: any) =>
-    {
+    userStream: async (parent: any, _: any, { prisma }: any) => {
       return await UserServices.getStreamsById(parent.streamId);
+    },
+    courses: async (parent: any, _: any) => {
+      return await UserServices.getCoursesByUserId(parent.id);
     }
   },
   Course: {
-    courseStream: async (parent: any, _: any, { prisma }: any) =>
-    {
+    courseStream: async (parent: any, _: any, { prisma }: any) => {
       return await UserServices.getStreamsById(parent.streamId);
+    },
+    users: async (parent: any, _: any) => {
+      return await UserServices.getUsersByCourseId(parent.id);
     }
   },
   Stream: {
-    users: async (parent: any, _: any, { prisma }: any) =>
-    {
+    users: async (parent: any, _: any, { prisma }: any) => {
       return await UserServices.getUsersByStreamId(parent.id);
     },
-    courses: async (parent: any, _: any, { prisma }: any) =>
-    {
+    courses: async (parent: any, _: any, { prisma }: any) => {
       return await UserServices.getCoursesByStreamId(parent.id);
     }
   }
