@@ -38,6 +38,8 @@ export const typeDefs = `#graphql
     createUser(name: String!, email: String!, streamId: ID!): User!
     createStream(name: String!): Stream!
     createCourse(name: String!, streamId: ID!): Course!
+
+    # updateUser(id: ID!, data: ) : User!
   }
 `;
 
